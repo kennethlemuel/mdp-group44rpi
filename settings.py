@@ -1,5 +1,5 @@
 # STM32 BOARD SERIAL CONNECTION
-SERIAL_PORT = "/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0002-if00-port0"  # stm32
+SERIAL_PORT = "/dev/ttyUSB0"  # stm32
 BAUD_RATE = 115200
 
 # API DETAILS

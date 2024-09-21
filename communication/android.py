@@ -121,6 +121,7 @@ class AndroidLink(Link):
         """
         self.logger.info("Bluetooth connection started")
         try:
+            self.logger.info("in")
             # Set RPi to be discoverable in order for service to be advertisable
             os.system("sudo hciconfig hci0 piscan")
 
@@ -128,13 +129,16 @@ class AndroidLink(Link):
             self.server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
             self.server_sock.bind(("", bluetooth.PORT_ANY))
             self.server_sock.listen(1)
+            self.logger.info("initialised server socket")
 
             # Parameters
             port = self.server_sock.getsockname()[1]
-            uuid = '94f39d29-7d6d-437d-973b-fba39e49d4ee'
+            uuid = '00001101-0000-1000-8000-00805F9B34FB'
+            self.logger.info("paramsset")
+
 
             # Advertise
-            bluetooth.advertise_service(self.server_sock, "MDP-Group2-RPi", service_id=uuid, service_classes=[
+            bluetooth.advertise_service(self.server_sock, "MDP-Group44-RPi", service_id=uuid, service_classes=[
                                         uuid, bluetooth.SERIAL_PORT_CLASS], profiles=[bluetooth.SERIAL_PORT_PROFILE])
 
             self.logger.info(
@@ -144,8 +148,10 @@ class AndroidLink(Link):
 
         except Exception as e:
             self.logger.error(f"Error in Bluetooth link connection: {e}")
-            self.server_sock.close()
-            self.client_sock.close()
+            if self.server_sock:
+                self.server_sock.close()
+            if self.client_sock:
+                self.client_sock.close()
 
     def disconnect(self):
         """Disconnect from Android Bluetooth connection and shutdown all the sockets established"""

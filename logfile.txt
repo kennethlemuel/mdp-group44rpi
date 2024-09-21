@@ -1,0 +1,96 @@
+2024-09-20 12:27:03,653 :: INFO :: Bluetooth connection started
+2024-09-20 12:27:03,708 :: ERROR :: Error in Bluetooth link connection: [Errno 2] No such file or directory
+2024-09-20 12:28:53,624 :: INFO :: Bluetooth connection started
+2024-09-20 12:28:53,659 :: ERROR :: Error in Bluetooth link connection: [Errno 2] No such file or directory
+2024-09-20 12:32:05,999 :: INFO :: Bluetooth connection started
+2024-09-20 12:32:06,031 :: INFO :: initialised server socket
+2024-09-20 12:32:06,032 :: INFO :: paramsset
+2024-09-20 12:32:06,034 :: ERROR :: Error in Bluetooth link connection: [Errno 2] No such file or directory
+2024-09-20 12:40:14,533 :: INFO :: Bluetooth connection started
+2024-09-20 12:40:14,562 :: INFO :: initialised server socket
+2024-09-20 12:40:14,564 :: INFO :: paramsset
+2024-09-20 12:40:14,565 :: ERROR :: Error in Bluetooth link connection: [Errno 2] No such file or directory
+2024-09-20 12:51:32,804 :: INFO :: Bluetooth connection started
+2024-09-20 12:51:32,846 :: INFO :: initialised server socket
+2024-09-20 12:51:32,847 :: INFO :: paramsset
+2024-09-20 12:51:32,848 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 13:30:48,242 :: INFO :: Bluetooth connection started
+2024-09-20 13:30:48,292 :: INFO :: initialised server socket
+2024-09-20 13:30:48,294 :: INFO :: paramsset
+2024-09-20 13:30:48,296 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 13:31:10,296 :: INFO :: Bluetooth connection started
+2024-09-20 13:31:10,342 :: INFO :: initialised server socket
+2024-09-20 13:31:10,343 :: INFO :: paramsset
+2024-09-20 13:31:10,345 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 13:31:23,623 :: INFO :: Bluetooth connection started
+2024-09-20 13:31:23,663 :: INFO :: initialised server socket
+2024-09-20 13:31:23,665 :: INFO :: paramsset
+2024-09-20 13:31:23,666 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 13:34:24,141 :: INFO :: Bluetooth connection started
+2024-09-20 13:34:24,173 :: INFO :: initialised server socket
+2024-09-20 13:34:24,175 :: INFO :: paramsset
+2024-09-20 13:34:24,176 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 13:41:15,450 :: INFO :: Bluetooth connection started
+2024-09-20 13:41:15,495 :: INFO :: initialised server socket
+2024-09-20 13:41:15,496 :: INFO :: paramsset
+2024-09-20 13:41:15,498 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 13:57:26,061 :: INFO :: Bluetooth connection started
+2024-09-20 13:57:26,062 :: INFO :: in
+2024-09-20 13:57:26,087 :: INFO :: initialised server socket
+2024-09-20 13:57:26,088 :: INFO :: paramsset
+2024-09-20 13:57:26,089 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 14:00:57,797 :: INFO :: Bluetooth connection started
+2024-09-20 14:00:57,798 :: INFO :: in
+2024-09-20 14:00:57,824 :: INFO :: initialised server socket
+2024-09-20 14:00:57,826 :: INFO :: paramsset
+2024-09-20 14:00:57,827 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 14:01:37,068 :: INFO :: Bluetooth connection started
+2024-09-20 14:01:37,069 :: INFO :: in
+2024-09-20 14:01:37,097 :: INFO :: initialised server socket
+2024-09-20 14:01:37,098 :: INFO :: paramsset
+2024-09-20 14:01:37,099 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 14:01:37,109 :: WARNING :: API Exception: Invalid URL 'http://:5000/status': No host supplied
+2024-09-20 14:02:11,738 :: INFO :: Bluetooth connection started
+2024-09-20 14:02:11,739 :: INFO :: in
+2024-09-20 14:02:11,772 :: INFO :: initialised server socket
+2024-09-20 14:02:11,773 :: INFO :: paramsset
+2024-09-20 14:02:11,775 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 14:02:11,785 :: WARNING :: API Exception: Invalid URL 'http://:5000/status': No host supplied
+2024-09-20 14:02:11,808 :: INFO :: Child Processes started
+2024-09-20 14:02:11,820 :: INFO :: Reconnection handler is watching...
+2024-09-20 14:02:31,132 :: DEBUG :: Disconnecting Bluetooth link
+2024-09-20 14:02:31,134 :: ERROR :: Failed to disconnect Bluetooth link: [Errno 9] Bad file descriptor
+2024-09-20 14:02:41,337 :: INFO :: Bluetooth connection started
+2024-09-20 14:02:41,338 :: INFO :: in
+2024-09-20 14:02:41,366 :: INFO :: initialised server socket
+2024-09-20 14:02:41,367 :: INFO :: paramsset
+2024-09-20 14:02:41,368 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 14:02:44,592 :: INFO :: Bluetooth connection started
+2024-09-20 14:02:44,593 :: INFO :: in
+2024-09-20 14:02:44,634 :: INFO :: initialised server socket
+2024-09-20 14:02:44,635 :: INFO :: paramsset
+2024-09-20 14:02:44,637 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 14:03:30,627 :: INFO :: Bluetooth connection started
+2024-09-20 14:03:30,628 :: INFO :: in
+2024-09-20 14:03:30,659 :: INFO :: initialised server socket
+2024-09-20 14:03:30,661 :: INFO :: paramsset
+2024-09-20 14:03:30,662 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 14:08:16,230 :: INFO :: Bluetooth connection started
+2024-09-20 14:08:16,231 :: INFO :: in
+2024-09-20 14:08:16,259 :: INFO :: initialised server socket
+2024-09-20 14:08:16,260 :: INFO :: paramsset
+2024-09-20 14:08:16,261 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 14:10:42,123 :: INFO :: Bluetooth connection started
+2024-09-20 14:10:42,124 :: INFO :: in
+2024-09-20 14:10:42,159 :: INFO :: initialised server socket
+2024-09-20 14:10:42,160 :: INFO :: paramsset
+2024-09-20 14:10:42,162 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 14:11:12,713 :: INFO :: Bluetooth connection started
+2024-09-20 14:11:12,716 :: INFO :: in
+2024-09-20 14:11:12,757 :: INFO :: initialised server socket
+2024-09-20 14:11:12,759 :: INFO :: paramsset
+2024-09-20 14:11:12,761 :: ERROR :: Error in Bluetooth link connection: [Errno 13] Permission denied
+2024-09-20 14:11:12,776 :: INFO :: Connected to STM32
+2024-09-20 14:11:12,783 :: WARNING :: API Exception: Invalid URL 'http://:5000/status': No host supplied
+2024-09-20 14:11:12,827 :: INFO :: Child Processes started
+2024-09-20 14:11:12,838 :: INFO :: Reconnection handler is watching...

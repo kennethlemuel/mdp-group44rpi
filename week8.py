@@ -10,8 +10,12 @@ from communication.android import AndroidLink, AndroidMessage
 from communication.stm32 import STMLink
 from constants import SYMBOL_MAP
 from logger import prepare_logger
-from settings import API_IP, API_PORT
-
+from settings import API_IP, API_PORT, IMG_IP, IMG_PORT
+from PIL import Image,ImageDraw, ImageFont
+from picamera import PiCamera
+import glob
+import shutil
+from datetime import datetime
 
 class PiAction:
     """
@@ -196,8 +200,8 @@ class RaspberryPi:
 
                     # Commencing path following
                     if not self.command_queue.empty():
-                        self.logger.info("Gryo reset!")
-                        self.stm_link.send("RS00")
+                        #self.logger.info("Gryo reset!")
+                        #self.stm_link.send("RS00")
                         # Main trigger to start movement #
                         self.unpause.set()
                         self.logger.info(
@@ -220,17 +224,17 @@ class RaspberryPi:
 
             message: str = self.stm_link.recv()
 
-            if message.startswith("ACK"):
+            if message.startswith("0"):
                 if self.rs_flag == False:
                     self.rs_flag = True
                     self.logger.debug("ACK for RS00 from STM32 received.")
-                    continue
+                    #continue
                 try:
                     self.movement_lock.release()
-                    try:
-                        self.retrylock.release()
-                    except:
-                        pass
+                    #try:
+                        #self.retrylock.release()
+                    #except:
+                     #   pass
                     self.logger.debug(
                         "ACK from STM32 received, movement lock released.")
 
@@ -281,8 +285,8 @@ class RaspberryPi:
             # Wait for unpause event to be true [Main Trigger]
             try:
                 self.logger.debug("wait for retrylock")
-                self.retrylock.acquire()
-                self.retrylock.release()
+                #self.retrylock.acquire()
+                #self.retrylock.release()
             except:
                 self.logger.debug("wait for unpause")
                 self.unpause.wait()
@@ -364,120 +368,80 @@ class RaspberryPi:
         self.logger.info(f"Capturing image for obstacle id: {obstacle_id}")
         self.android_queue.put(AndroidMessage(
             "info", f"Capturing image for obstacle id: {obstacle_id}"))
-        url = f"http://{API_IP}:{API_PORT}/image"
+        url = f"http://{IMG_IP}:{IMG_PORT}/predict"
         filename = f"{int(time.time())}_{obstacle_id}_{signal}.jpg"
+        
+        image_folder = "~/shared/sc2079group44rpi/captured_images/"
+        annotated_folder = "~/shared/sc2079group44rpi/annotated_images/"
 
-        con_file = "PiLCConfig9.txt"
-        Home_Files = []
-        Home_Files.append(os.getlogin())
-        config_file = "/home/" + Home_Files[0] + "/" + con_file
-
-        extns = ['jpg', 'png', 'bmp', 'rgb', 'yuv420', 'raw']
-        shutters = [-2000, -1600, -1250, -1000, -800, -640, -500, -400, -320, -288, -250, -240, -200, -160, -144, -125, -120, -100, -96, -80, -60, -50, -48, -40, -30, -25, -20, -
-                    15, -13, -10, -8, -6, -5, -4, -3, 0.4, 0.5, 0.6, 0.8, 1, 1.1, 1.2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 20, 25, 30, 40, 50, 60, 75, 100, 112, 120, 150, 200, 220, 230, 239, 435]
-        meters = ['centre', 'spot', 'average']
-        awbs = ['off', 'auto', 'incandescent', 'tungsten',
-                'fluorescent', 'indoor', 'daylight', 'cloudy']
-        denoises = ['off', 'cdn_off', 'cdn_fast', 'cdn_hq']
-
-        config = []
-        with open(config_file, "r") as file:
-            line = file.readline()
-            while line:
-                config.append(line.strip())
-                line = file.readline()
-            config = list(map(int, config))
-        mode = config[0]
-        speed = config[1]
-        gain = config[2]
-        brightness = config[3]
-        contrast = config[4]
-        red = config[6]
-        blue = config[7]
-        ev = config[8]
-        extn = config[15]
-        saturation = config[19]
-        meter = config[20]
-        awb = config[21]
-        sharpness = config[22]
-        denoise = config[23]
-        quality = config[24]
-
+        if not os.path.exists(image_folder):
+            os.makedirs(image_folder)
+        if not os.path.exists(annotated_folder):
+            os.makedirs(annotated_folder)
+        image_path = os.path.join(image_folder, filename)   
         retry_count = 0
-
         while True:
-
             retry_count += 1
+            camera = PiCamera()
+            camera.resolution = (520,520)
+            camera.brightness = 65
+            camera.contrast = 75
+            camera.sharpness = 100
 
-            shutter = shutters[speed]
-            if shutter < 0:
-                shutter = abs(1/shutter)
-            sspeed = int(shutter * 1000000)
-            if (shutter * 1000000) - int(shutter * 1000000) > 0.5:
-                sspeed += 1
-
-            rpistr = "libcamera-still -e " + \
-                extns[extn] + " -n -t 500 -o " + filename
-            rpistr += " --brightness " + \
-                str(brightness/100) + " --contrast " + str(contrast/100)
-            rpistr += " --shutter " + str(sspeed)
-            if ev != 0:
-                rpistr += " --ev " + str(ev)
-            if sspeed > 1000000 and mode == 0:
-                rpistr += " --gain " + str(gain) + " --immediate "
-            else:
-                rpistr += " --gain " + str(gain)
-                if awb == 0:
-                    rpistr += " --awbgains " + str(red/10) + "," + str(blue/10)
-                else:
-                    rpistr += " --awb " + awbs[awb]
-            rpistr += " --metering " + meters[meter]
-            rpistr += " --saturation " + str(saturation/10)
-            rpistr += " --sharpness " + str(sharpness/10)
-            rpistr += " --quality " + str(quality)
-            rpistr += " --denoise " + denoises[denoise]
-            rpistr += " --metadata - --metadata-format txt >> PiLibtext.txt"
-
-            os.system(rpistr)
+            # Start the camera and take a picture
+            camera.capture(image_path)
+            camera.close()
 
             self.logger.debug("Requesting from image API")
-
-            response = requests.post(
-                url, files={"file": (filename, open(filename, 'rb'))})
-
-            if response.status_code != 200:
-                self.logger.error(
-                    "Something went wrong when requesting path from image-rec API. Please try again.")
-                return
-
-            results = json.loads(response.content)
+            with open(image_path, 'rb') as file:
+                files = {'file': (filename, file)}
+                response = requests.post(url, files=files)
+                data = response.json()
+                x1 = data[0].get("x1")
+                x2 = data[0].get("x2")
+                y1 = data[0].get("y1")
+                y2 = data[0].get("y2")
+                label = data[0].get("class_name")
+                img_id = data[0].get("class_id")
+                conf = data[0].get("confidence")
+            if img_id != 'NA' or retry_count > 2:
+                break
+            self.logger.debug("Image recognition error, recapturing...")
+            
+            
+        with Image.open(image_path) as img:
+            try:
+                font = ImageFont.truetype("DejaVuSans-Bold.ttf",50)
+            except IOError:
+                print("cannot find font")
+                font = ImageFont.load_default()
+            draw = ImageDraw.Draw(img)
+            draw.rectangle([x1,y1,x2,y2], outline='red', width=3)
+            text_w, text_h = draw.textsize(label, font = font)
+    
+            text_position = (x1 + 5, y1 - text_h - 10)
+            draw.text(text_position, label, fill='red', font=font)
+            current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+            save_path = os.path.join(annotated_folder, f"image_{current_time}_{label}.jpg")
+            img.save(save_path)
+            #img.show()
+        
+        results = {"image_id" : img_id,"obstacle_id" : obstacle_id,"conf": conf}
+           # results = json.loads(response.content)
 
             # Higher brightness retry
-
-            if results['image_id'] != 'NA' or retry_count > 6:
-                break
-            elif retry_count > 3:
-                self.logger.info(f"Image recognition results: {results}")
-                self.logger.info("Recapturing with lower shutter speed...")
-                speed -= 1
-            elif retry_count <= 3:
-                self.logger.info(f"Image recognition results: {results}")
-                self.logger.info("Recapturing with higher shutter speed...")
-                speed += 1
-
+        
+            
         # release lock so that bot can continue moving
         self.movement_lock.release()
-        try:
-            self.retrylock.release()
-        except:
-            pass
+
 
         self.logger.info(f"results: {results}")
         self.logger.info(f"self.obstacles: {self.obstacles}")
         self.logger.info(
             f"Image recognition results: {results} ({SYMBOL_MAP.get(results['image_id'])})")
 
-        if results['image_id'] == 'NA':
+        """if results['image_id'] == 'NA':
             self.failed_obstacles.append(
                 self.obstacles[int(results['obstacle_id'])])
             self.logger.info(
@@ -487,7 +451,7 @@ class RaspberryPi:
             self.success_obstacles.append(
                 self.obstacles[int(results['obstacle_id'])])
             self.logger.info(
-                f"self.success_obstacles: {self.success_obstacles}")
+                f"self.success_obstacles: {self.success_obstacles}")"""
         self.android_queue.put(AndroidMessage("image-rec", results))
 
     def request_algo(self, data, robot_x=1, robot_y=1, robot_dir=0, retrying=False):
@@ -503,6 +467,7 @@ class RaspberryPi:
                 "robot_y": robot_y, "robot_dir": robot_dir, "retrying": retrying}
         url = f"http://{API_IP}:{API_PORT}/path"
         response = requests.post(url, json=body)
+        self.logger.info("Robot_x: {robot_x}, Robot_Y: {robot_y}")
 
         # Error encountered at the server, return early
         if response.status_code != 200:
@@ -534,17 +499,32 @@ class RaspberryPi:
 
     def request_stitch(self):
         """Sends a stitch request to the image recognition API to stitch the different images together"""
-        url = f"http://{API_IP}:{API_PORT}/stitch"
-        response = requests.get(url)
+        """url = f"http://{API_IP}:{API_PORT}/stitch"
+        response = requests.get(url)"""
 
-        # If error, then log, and send error to Android
-        if response.status_code != 200:
-            # Notify android
-            self.android_queue.put(AndroidMessage(
-                "error", "Something went wrong when requesting stitch from the API."))
-            self.logger.error(
-                "Something went wrong when requesting stitch from the API.")
-            return
+    # Initialize path to save stitched image
+        imgFolder = 'runs'
+        annotated_folder = "~/shared/sc2079group44rpi/annotated_images/"
+        stitchedPath = os.path.join(annotated_folder, f'stitched-{int(time.time())}.jpeg')
+        #annotated_folder = "/shared/annotated_images"
+
+        imgPaths = glob.glob(os.path.join(annotated_folder, "*.jpg"))
+        # Open all images
+        images = [Image.open(x) for x in imgPaths]
+        # Get the width and height of each image
+        width, height = zip(*(i.size for i in images))
+        # Calculate the total width and max height of the stitched image, as we are stitching horizontally
+        total_width = sum(width)
+        max_height = max(height)
+        stitchedImg = Image.new('RGB', (total_width, max_height))
+        x_offset = 0
+
+        # Stitch the images together
+        for im in images:
+            stitchedImg.paste(im, (x_offset, 0))
+            x_offset += im.size[0]
+        # Save the stitched image to the path
+        stitchedImg.save(stitchedPath)
 
         self.logger.info("Images stitched!")
         self.android_queue.put(AndroidMessage("info", "Images stitched!"))

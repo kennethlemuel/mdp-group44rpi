@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+    #!/usr/bin/env python3
 import json
 import queue
 import time
@@ -8,10 +8,13 @@ import os
 import requests
 from communication.android import AndroidLink, AndroidMessage
 from communication.stm32 import STMLink
-from consts import SYMBOL_MAP
 from logger import prepare_logger
-from settings import API_IP, API_PORT
-
+from settings import API_IP, API_PORT, IMG_IP, IMG_PORT
+from PIL import Image,ImageDraw, ImageFont
+from picamera import PiCamera
+import glob
+import shutil
+from datetime import datetime
 
 class PiAction:
     def __init__(self, cat, value):
@@ -61,7 +64,6 @@ class RaspberryPi:
         self.proc_rpi_action = None
 
         self.ack_count = 0
-        self.near_flag = self.manager.Lock()
 
     def start(self):
         """Starts the RPi orchestrator"""
@@ -74,7 +76,7 @@ class RaspberryPi:
             self.stm_link.connect()
 
             # Check Image Recognition and Algorithm API status
-            self.check_api()
+            self.check_api() #commented out
             
             #self.small_direction = self.snap_and_rec("Small")
             #self.logger.info(f"PREINFER small direction is: {self.small_direction}")
@@ -185,23 +187,31 @@ class RaspberryPi:
                         self.logger.error("API is down! Start command aborted.")
 
                     self.clear_queues()
-                    self.command_queue.put("RS00") # ack_count = 1
+                    self.command_queue.put(["FP_1", 3000, 100, 50]) # ack_count = 1
+
                     
                     # Small object direction detection
-                    self.small_direction = self.snap_and_rec("Small")
+                    """self.small_direction = self.snap_and_rec("Small")
                     self.logger.info(f"HERE small direction is: {self.small_direction}")
-                    if self.small_direction == "Left Arrow": 
-                        self.command_queue.put("OB01") # ack_count = 3
-                        self.command_queue.put("UL00") # ack_count = 5
-                    elif self.small_direction == "Right Arrow":
-                        self.command_queue.put("OB01") # ack_count = 3
-                        self.command_queue.put("UR00") # ack_count = 5
-
+                    if self.small_direction == "Left": 
+                        self.command_queue.put(["FORWARD_TURN", 1500, 40, 25])
+                        self.command_queue.put(["FORWARD", 1000, 25, 0]) 
+                        self.command_queue.put(["FORWARD_TURN", 1500, -120, 60]) 
+                        self.command_queue.put(["FORWARD_TURN", 1000, -20, 10]) 
+                        self.command_queue.put(["FORWARD_TURN", 1000, 60, 30]) 
+                        self.command_queue.put(["FP_1", 2500, 100, 30])
+                    elif self.small_direction == "Right":
+                        self.command_queue.put(["FORWARD_TURN", 1500, -40, 30]) 
+                        self.command_queue.put(["FORWARD", 1000, 30, 0]) 
+                        self.command_queue.put(["FORWARD_TURN", 1500, 100, 40]) 
+                        self.command_queue.put(["FORWARD_TURN", 1000, 20, 15]) 
+                        self.command_queue.put(["FORWARD_TURN", 1000, -100, 35]) 
+                        self.command_queue.put(["FP_1", 2500, 100, 30])
                     elif self.small_direction == None or self.small_direction == 'None':
                         self.logger.info("Acquiring near_flag log")
-                        self.near_flag.acquire()             
+                        self.near_flag.acquire()       """      
                         
-                        self.command_queue.put("OB01") # ack_count = 3
+                        #self.command_queue.put("OB01") # ack_count = 3
                         
 
                     self.logger.info("Start command received, starting robot on Week 9 task!")
@@ -218,7 +228,7 @@ class RaspberryPi:
 
             message: str = self.stm_link.recv()
             # Acknowledgement from STM32
-            if message.startswith("ACK"):
+            if message.startswith("0"):
 
                 self.ack_count += 1
 
@@ -232,35 +242,109 @@ class RaspberryPi:
                 
                 
                 self.logger.info(f"self.ack_count: {self.ack_count}")
-                if self.ack_count == 3:
+                if self.ack_count == 1:
                     try:
-                        self.near_flag.release()
+                    
+                        #self.near_flag.release()
                         self.logger.debug("First ACK received, robot reached first obstacle!")
                         self.small_direction = self.snap_and_rec("Small_Near")
-                        if self.small_direction == "Left Arrow": 
-                            self.command_queue.put("UL00") # ack_count = 5
-                        elif self.small_direction == "Right Arrow":
-                            self.command_queue.put("UR00") # ack_count = 5
+                        if  self.small_direction == 'Left': 
+                            self.command_queue.put(["FORWARD_TURN", 2000, 45, 30])
+                            self.command_queue.put(["FORWARD", 1000, 15, 0]) 
+                            self.command_queue.put(["FORWARD_TURN", 2000, -45, 30]) 
+                            self.command_queue.put(["FORWARD", 1000, 20, 0]) 
+                            self.command_queue.put(["FORWARD_TURN", 2000, -45, 30])
+                            self.command_queue.put(["FORWARD", 1000, 15, 0]) 
+                            self.command_queue.put(["FORWARD_TURN", 2000, 45, 30]) 
+                            self.command_queue.put(["FP_1", 3000, 200, 30])
                         else:
-                            self.command_queue.put("UL00") # ack_count = 5
-                            self.logger.debug("Failed first one, going left by default!")
-                    # except:
-                        # self.logger.info("No need to release near_flag")
-                    
-                # if self.ack_count == 3:
+                            self.command_queue.put(["FORWARD_TURN", 2000, -45, 30])
+                            self.command_queue.put(["FORWARD", 1000, 15, 0]) 
+                            self.command_queue.put(["FORWARD_TURN", 2000, 45, 30]) 
+                            self.command_queue.put(["FORWARD", 1000, 20, 0]) 
+                            self.command_queue.put(["FORWARD_TURN", 2000, 45, 30])
+                            self.command_queue.put(["FORWARD", 1000, 15, 0])  
+                            self.command_queue.put(["FORWARD_TURN", 2000, -45, 30]) 
+                            self.command_queue.put(["FP_1", 3000, 200, 30])
+                        
                     except:
-                        time.sleep(2)
+                        self.logger.info("No need to release near_flag")
+                '''
+                if self.ack_count == 5:
+                    self.large_direction = self.snap_and_rec("Large")
+                    if  self.small_direction == 'Left': 
+                        self.command_queue.put(["FORWARD_TURN", 2000, -45, 30]) 
+                        self.command_queue.put(["FORWARD_TURN", 2000, 45, 30]) 
+                        self.command_queue.put(["FP_1", 3000, 200, 30])
+                    elif self.small_direction == 'Right':
+                        self.command_queue.put(["FORWARD_TURN", 2000, 45, 30]) 
+                        self.command_queue.put(["FORWARD_TURN", 2000, -45, 30]) 
+                        self.command_queue.put(["FP_1", 3000, 200, 30])
+                    else:
+                        self.command_queue.put(["FORWARD_TURN", 2000, 45, 30]) 
+                        self.command_queue.put(["FORWARD_TURN", 2000, -45, 30]) 
+                        self.command_queue.put(["FP_1", 3000, 200, 30])
+                        self.logger.debug("Failed first one, going left by default!")
+                '''
+                if self.ack_count == 9:
+                    RIGHT = 0
+                    LEFT = 1
+                    self.large_direction = self.snap_and_rec("Large")
+                    try:
+                        #time.sleep(2)
                         self.logger.debug("First ACK received, robot finished first obstacle!")
-                        self.large_direction = self.snap_and_rec("Large")
-                        if self.large_direction == "Left Arrow": 
-                            self.command_queue.put("PL01") # ack_count = 6
-                        elif self.large_direction == "Right Arrow":
-                            self.command_queue.put("PR01") # ack_count = 6
+                        if self.large_direction == "Left":
+                            self.command_queue.put(["FORWARD_LEFT2", 3000, 70, 0])
+                            self.command_queue.put(["FORWARD_UPO", 2000, 40, RIGHT])
+                            #self.command_queue.put(["FORWARD", 2000, 10, 0])
+                            self.command_queue.put(["FORWARD_RIGHT2", 3000, 70, 0])
+                            self.command_queue.put(["FORWARD_RIGHT2", 3000, 70, 0])
+                            self.command_queue.put(["FORWARD_UDO", 2000, 40, RIGHT])
+                            self.command_queue.put(["FORWARD_UPO", 2000, 40, RIGHT])
+                            self.command_queue.put(["FORWARD_RIGHT2", 3000, 70, 0])
+                            self.command_queue.put(["FP_2", 3000, 0, 70])
+                            self.command_queue.put(["FORWARD", 2000, 20, 0])
+                            self.command_queue.put(["FORWARD_RIGHT2", 3000, 70, 0])
+                            self.command_queue.put(["BACKWARD", 2000, 30, 0])
+                            self.command_queue.put(["FORWARD_UDO", 2000, 30, RIGHT])
+                            self.command_queue.put(["BACKWARD", 2000, 10, 0])
+                            self.command_queue.put(["FORWARD_LEFT2", 3000, 70, 0])
+                            self.command_queue.put(["FP_1", 2000, 100, 20])
                         else:
-                            self.command_queue.put("PR01") # ack_count = 6
-                            self.logger.debug("Failed second one, going right by default!")
+                            self.command_queue.put(["FORWARD_RIGHT2", 3000, 70, 0])
+                            self.command_queue.put(["FORWARD_UPO", 2000, 40, LEFT])
+                            #self.command_queue.put(["FORWARD", 2000, 10, 0])
+                            self.command_queue.put(["FORWARD_LEFT2", 3000, 70, 0])
+                            self.command_queue.put(["FORWARD_LEFT2", 3000, 70, 0])
+                            self.command_queue.put(["FORWARD_UDO", 2000, 40, LEFT])
+                            self.command_queue.put(["FORWARD_UPO", 2000, 40, LEFT])
+                            self.command_queue.put(["FORWARD_LEFT2", 3000, 70, 0])
+                            self.command_queue.put(["FP_2", 3000, 0, 70])
+                            self.command_queue.put(["FORWARD", 2000, 20, 0])
+                            self.command_queue.put(["FORWARD_LEFT2", 3000, 70, 0])
+                            self.command_queue.put(["BACKWARD", 2000, 30, 0])
+                            self.command_queue.put(["FORWARD_UDO", 2000, 40, LEFT])
+                            self.command_queue.put(["BACKWARD", 2000, 10, 0])
+                            self.command_queue.put(["FORWARD_RIGHT2", 3000, 70, 0])
+                            self.command_queue.put(["FP_1", 2000, 100, 15])
+                        '''else:
+                            self.command_queue.put(["FORWARD_RIGHT", 1000, 70, 0])
+                            self.command_queue.put(["FORWARD_UPO", 1500, 100, 1])
+                            self.command_queue.put(["BACKWARD", 2000, 20, 0])
+                            self.command_queue.put(["FORWARD_LEFT", 1000, 60, 0])
+                            self.command_queue.put(["FORWARD_LEFT", 1000, 60, 0])
+                            self.command_queue.put(["FORWARD_UPO", 1500, 100, 1])
+                            self.command_queue.put(["FORWARD_LEFT", 1000, 60, 0])
+                            self.command_queue.put(["FP_2", 2000, 0, 70])
+                            self.command_queue.put(["FORWARD_LEFT", 1000, 60, 0])
+                            self.command_queue.put(["BACKWARD", 2000, 40, 0])
+                            self.command_queue.put(["FORWARD_RIGHT", 1000, 70, 0])
+                            self.command_queue.put(["FP_1", 1000, 100, 20])
+                            self.logger.debug("Failed second one, going right by default!")'''
+                    except:
+                        self.logger.info("No need to release near_flag")
 
-                if self.ack_count == 6:
+                if self.ack_count == 12:
                     self.logger.debug("Second ACK received from STM32!")
                     self.android_queue.put(AndroidMessage("status", "finished"))
                     self.command_queue.put("FIN")
@@ -286,13 +370,12 @@ class RaspberryPi:
 
     def command_follower(self) -> None:
         while True:
-            command: str = self.command_queue.get()
+            command: list = self.command_queue.get()
             self.unpause.wait()
             self.movement_lock.acquire()
-            stm32_prefixes = ("STOP", "ZZ", "UL", "UR", "PL", "PR", "RS", "OB")
-            if command.startswith(stm32_prefixes):
-                self.stm_link.send(command)
-            elif command == "FIN":
+            stm32_prefixes = ("FS", "BS", "FW", "BW", "FL", "FR", "BL",
+                              "BR", "TL", "TR", "A", "C", "DT", "STOP", "ZZ", "RS")
+            if command == "FIN":
                 self.unpause.clear()
                 self.movement_lock.release()
                 self.logger.info("Commands queue finished.")
@@ -300,7 +383,9 @@ class RaspberryPi:
                 self.android_queue.put(AndroidMessage("status", "finished"))
                 self.rpi_action_queue.put(PiAction(cat="stitch", value=""))
             else:
-                raise Exception(f"Unknown command: {command}")
+                self.stm_link.send_week9(command)
+                self.logger.debug(f"Sending to STM32: {command}")
+                time.sleep(1)
 
     def rpi_action(self):
         while True:
@@ -316,126 +401,111 @@ class RaspberryPi:
         :param obstacle_id: the current obstacle ID
         """
         
+        
         self.logger.info(f"Capturing image for obstacle id: {obstacle_id}")
-        signal = "C"
-        url = f"http://{API_IP}:{API_PORT}/image"
-        filename = f"{int(time.time())}_{obstacle_id}_{signal}.jpg"
+        self.android_queue.put(AndroidMessage(
+            "info", f"Capturing image for obstacle id: {obstacle_id}"))
+        url = f"http://{IMG_IP}:{IMG_PORT}/predict_week9"
+        filename = f"{int(time.time())}_{obstacle_id}.jpg"
         
-        
-        con_file    = "PiLCConfig9.txt"
-        Home_Files  = []
-        Home_Files.append(os.getlogin())
-        config_file = "/home/" + Home_Files[0]+ "/" + con_file
+        image_folder = "~/shared/sc2079group44rpi/captured_images/"
+        annotated_folder = "~/shared/sc2079group44rpi/annotated_images/"
 
-        extns        = ['jpg','png','bmp','rgb','yuv420','raw']
-        shutters     = [-2000,-1600,-1250,-1000,-800,-640,-500,-400,-320,-288,-250,-240,-200,-160,-144,-125,-120,-100,-96,-80,-60,-50,-48,-40,-30,-25,-20,-15,-13,-10,-8,-6,-5,-4,-3,0.4,0.5,0.6,0.8,1,1.1,1.2,2,3,4,5,6,7,8,9,10,11,15,20,25,30,40,50,60,75,100,112,120,150,200,220,230,239,435]
-        meters       = ['centre','spot','average']
-        awbs         = ['off','auto','incandescent','tungsten','fluorescent','indoor','daylight','cloudy']
-        denoises     = ['off','cdn_off','cdn_fast','cdn_hq']
-
-        config = []
-        with open(config_file, "r") as file:
-            line = file.readline()
-            while line:
-                config.append(line.strip())
-                line = file.readline()
-            config = list(map(int,config))
-        mode        = config[0]
-        speed       = config[1]
-        gain        = config[2]
-        brightness  = config[3]
-        contrast    = config[4]
-        red         = config[6]
-        blue        = config[7]
-        ev          = config[8]
-        extn        = config[15]
-        saturation  = config[19]
-        meter       = config[20]
-        awb         = config[21]
-        sharpness   = config[22]
-        denoise     = config[23]
-        quality     = config[24]
-        
+        if not os.path.exists(image_folder):
+            os.makedirs(image_folder)
+        if not os.path.exists(annotated_folder):
+            os.makedirs(annotated_folder)
+        image_path = os.path.join(image_folder, filename)   
         retry_count = 0
-        
         while True:
-        
             retry_count += 1
-        
-            shutter = shutters[speed]
-            if shutter < 0:
-                shutter = abs(1/shutter)
-            sspeed = int(shutter * 1000000)
-            if (shutter * 1000000) - int(shutter * 1000000) > 0.5:
-                sspeed +=1
-                
-            rpistr = "libcamera-still -e " + extns[extn] + " -n -t 100 -o " + filename
-            rpistr += " --brightness " + str(brightness/100) + " --contrast " + str(contrast/100)
-            rpistr += " --shutter " + str(sspeed)
-            if ev != 0:
-                rpistr += " --ev " + str(ev)
-            if sspeed > 1000000 and mode == 0:
-                rpistr += " --gain " + str(gain) + " --immediate "
-            else:    
-                rpistr += " --gain " + str(gain)
-                if awb == 0:
-                    rpistr += " --awbgains " + str(red/10) + "," + str(blue/10)
-                else:
-                    rpistr += " --awb " + awbs[awb]
-            rpistr += " --metering " + meters[meter]
-            rpistr += " --saturation " + str(saturation/10)
-            rpistr += " --sharpness " + str(sharpness/10)
-            rpistr += " --quality " + str(quality)
-            rpistr += " --denoise "    + denoises[denoise]
-            rpistr += " --metadata - --metadata-format txt >> PiLibtext.txt"
+            camera = PiCamera()
+            camera.resolution = (520,520)
+            camera.brightness = 65
+            camera.contrast = 75
+            camera.sharpness = 100
 
-            os.system(rpistr)
-            
-            
+
+            # Start the camera and take a picture
+            camera.capture(image_path)
+            camera.close()
+
             self.logger.debug("Requesting from image API")
-            
-            response = requests.post(url, files={"file": (filename, open(filename,'rb'))})
-
-            if response.status_code != 200:
-                self.logger.error("Something went wrong when requesting path from image-rec API. Please try again.")
-                return
-
-            results = json.loads(response.content)
-
-            # Higher brightness retry
-            
-            if results['image_id'] != 'NA' or retry_count > 6:
+            with open(image_path, 'rb') as file:
+                files = {'file': (filename, file)}
+                response = requests.post(url, files=files)
+                data = response.json()
+                x1 = data[0].get("x1")
+                x2 = data[0].get("x2")
+                y1 = data[0].get("y1")
+                y2 = data[0].get("y2")
+                label = data[0].get("class_name")
+                obs_id = data[0].get("class_id")
+            if obs_id != 'NA' or retry_count > 2:
                 break
-            elif retry_count <= 2:
-                self.logger.info(f"Image recognition results: {results}")
-                self.logger.info("Recapturing with same shutter speed...")
-            elif retry_count <= 4:
-                self.logger.info(f"Image recognition results: {results}")
-                self.logger.info("Recapturing with lower shutter speed...")
-                speed -= 1
-            elif retry_count == 5:
-                self.logger.info(f"Image recognition results: {results}")
-                self.logger.info("Recapturing with lower shutter speed...")
-                speed += 3
+            self.logger.debug("Image recognition error, recapturing...")
             
-        ans = SYMBOL_MAP.get(results['image_id'])
-        self.logger.info(f"Image recognition results: {results} ({ans})")
-        return ans
+            
+        with Image.open(image_path) as img:
+            try:
+                font = ImageFont.truetype("DejaVuSans-Bold.ttf",50)
+            except IOError:
+                print("cannot find font")
+                font = ImageFont.load_default()
+            draw = ImageDraw.Draw(img)
+            draw.rectangle([x1,y1,x2,y2], outline='red', width=3)
+            text_w, text_h = draw.textsize(label, font = font)
+            text_position = (x1 + 5, y1 - text_h - 10)
+            draw.text(text_position, label, fill='red', font=font)
+            current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+            save_path = os.path.join(annotated_folder, f"image_{current_time}_{label}.jpg")
+            img.save(save_path)
+            #img.show()
+        
+        results = {"image_id" : obs_id,"obstacle_id" : obstacle_id}
+           # 
+
+        
+            
+            
+            
+        self.logger.info(f"Image recognition results: ({label})")
+        return label
 
     def request_stitch(self):
-        url = f"http://{API_IP}:{API_PORT}/stitch"
-        response = requests.get(url)
-        if response.status_code != 200:
-            self.logger.error("Something went wrong when requesting stitch from the API.")
-            return
-        self.logger.info("Images stitched!")
+          # Initialize path to save stitched image
+        imgFolder = 'runs'
+        annotated_folder = "~/shared/sc2079group44rpi/annotated_images/"
+        stitchedPath = os.path.join(annotated_folder, f'stitched-{int(time.time())}.jpeg')
+        #annotated_folder = "/shared/annotated_images"
 
+        imgPaths = glob.glob(os.path.join(annotated_folder, "*.jpg"))
+        # Open all images
+        images = [Image.open(x) for x in imgPaths]
+        # Get the width and height of each image
+        width, height = zip(*(i.size for i in images))
+        # Calculate the total width and max height of the stitched image, as we are stitching horizontally
+        total_width = sum(width)
+        max_height = max(height)
+        stitchedImg = Image.new('RGB', (total_width, max_height))
+        x_offset = 0
+
+        # Stitch the images together
+        for im in images:
+            stitchedImg.paste(im, (x_offset, 0))
+            x_offset += im.size[0]
+        # Save the stitched image to the path
+        stitchedImg.save(stitchedPath)
+
+        self.logger.info("Images stitched!")
+        self.android_queue.put(AndroidMessage("info", "Images stitched!"))
+        
     def clear_queues(self):
         while not self.command_queue.empty():
             self.command_queue.get()
 
     def check_api(self) -> bool:
-        url = f"http://{API_IP}:{API_PORT}/status"
+        url = f"http://{IMG_IP}:{IMG_PORT}/status"
         try:
             response = requests.get(url, timeout=1)
             if response.status_code == 200:

@@ -52367,3 +52367,79 @@
 2024-10-16 17:14:11,119 :: INFO :: Disconnected Bluetooth link
 2024-10-16 17:14:11,120 :: INFO :: Disconnected from STM32
 2024-10-16 17:14:11,122 :: INFO :: Program exited!
+2024-10-17 17:56:13,486 :: INFO :: Bluetooth connection started
+2024-10-17 17:56:13,487 :: INFO :: in
+2024-10-17 17:56:13,514 :: INFO :: initialised server socket
+2024-10-17 17:56:13,515 :: INFO :: paramsset
+2024-10-17 17:56:13,516 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2024-10-17 17:56:17,611 :: INFO :: Accepted connection from: ('90:EE:C7:E7:D3:B8', 1)
+2024-10-17 17:56:17,625 :: INFO :: Connected to STM32
+2024-10-17 17:56:18,646 :: WARNING :: API Timeout
+2024-10-17 17:56:18,702 :: INFO :: Child Processes started
+2024-10-17 17:56:18,713 :: INFO :: Reconnection handler is watching...
+2024-10-17 17:56:18,758 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2024-10-17 17:56:18,759 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2024-10-17 17:56:18,760 :: DEBUG :: Sent to Android: {"cat": "mode", "value": "path"}
+2024-10-17 17:56:23,454 :: ERROR :: Error receiving message from Android: [Errno 104] Connection reset by peer
+2024-10-17 17:56:23,459 :: DEBUG :: Event set: Android connection dropped
+2024-10-17 17:56:23,460 :: ERROR :: Android link is down!
+2024-10-17 17:56:23,461 :: DEBUG :: Killing android child processes
+2024-10-17 17:56:23,469 :: DEBUG :: Android child processes killed
+2024-10-17 17:56:23,470 :: DEBUG :: Disconnecting Bluetooth link
+2024-10-17 17:56:23,472 :: INFO :: Disconnected Bluetooth link
+2024-10-17 17:56:23,472 :: INFO :: Bluetooth connection started
+2024-10-17 17:56:23,473 :: INFO :: in
+2024-10-17 17:56:23,524 :: INFO :: initialised server socket
+2024-10-17 17:56:23,525 :: INFO :: paramsset
+2024-10-17 17:56:23,527 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2024-10-17 17:56:26,304 :: INFO :: Accepted connection from: ('90:EE:C7:E7:D3:B8', 1)
+2024-10-17 17:56:26,324 :: INFO :: Android child processes restarted
+2024-10-17 17:56:26,382 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are reconnected!"}
+2024-10-17 17:56:26,386 :: DEBUG :: Sent to Android: {"cat": "mode", "value": "path"}
+2024-10-17 17:56:37,957 :: DEBUG :: b'{"cat":"obstacles","value":{"obstacles":[{"x":1,"y":14,"id":2,"d":2},{"x":12,"y":17,"id":5,"d":4},{"x":16,"y":11,"id":6,"d":6},{"x":7,"y":11,"id":4,"d":4},{"x":5,"y":5,"id":3,"d":6},{"x":16,"y":2,"id":1,"d":0}],"mode":"0","retrying":"False","robot_x":1,"robot_y":1,"robot_dir":0}}'
+2024-10-17 17:56:37,959 :: DEBUG :: Received from Android: {"cat":"obstacles","value":{"obstacles":[{"x":1,"y":14,"id":2,"d":2},{"x":12,"y":17,"id":5,"d":4},{"x":16,"y":11,"id":6,"d":6},{"x":7,"y":11,"id":4,"d":4},{"x":5,"y":5,"id":3,"d":6},{"x":16,"y":2,"id":1,"d":0}],"mode":"0","retrying":"False","robot_x":1,"robot_y":1,"robot_dir":0}}
+2024-10-17 17:56:37,965 :: DEBUG :: Set obstacles PiAction added to queue: {'cat': 'obstacles', 'value': {'obstacles': [{'x': 1, 'y': 14, 'id': 2, 'd': 2}, {'x': 12, 'y': 17, 'id': 5, 'd': 4}, {'x': 16, 'y': 11, 'id': 6, 'd': 6}, {'x': 7, 'y': 11, 'id': 4, 'd': 4}, {'x': 5, 'y': 5, 'id': 3, 'd': 6}, {'x': 16, 'y': 2, 'id': 1, 'd': 0}], 'mode': '0', 'retrying': 'False', 'robot_x': 1, 'robot_y': 1, 'robot_dir': 0}}
+2024-10-17 17:56:37,968 :: DEBUG :: PiAction retrieved from queue: obstacles {'obstacles': [{'x': 1, 'y': 14, 'id': 2, 'd': 2}, {'x': 12, 'y': 17, 'id': 5, 'd': 4}, {'x': 16, 'y': 11, 'id': 6, 'd': 6}, {'x': 7, 'y': 11, 'id': 4, 'd': 4}, {'x': 5, 'y': 5, 'id': 3, 'd': 6}, {'x': 16, 'y': 2, 'id': 1, 'd': 0}], 'mode': '0', 'retrying': 'False', 'robot_x': 1, 'robot_y': 1, 'robot_dir': 0}
+2024-10-17 17:56:37,972 :: INFO :: Requesting path from algo...
+2024-10-17 17:56:37,975 :: INFO :: data: {'obstacles': [{'x': 1, 'y': 14, 'id': 2, 'd': 2}, {'x': 12, 'y': 17, 'id': 5, 'd': 4}, {'x': 16, 'y': 11, 'id': 6, 'd': 6}, {'x': 7, 'y': 11, 'id': 4, 'd': 4}, {'x': 5, 'y': 5, 'id': 3, 'd': 6}, {'x': 16, 'y': 2, 'id': 1, 'd': 0}], 'mode': '0', 'retrying': 'False', 'robot_x': 1, 'robot_y': 1, 'robot_dir': 0}
+2024-10-17 17:56:37,976 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Requesting path from algo..."}
+2024-10-17 17:56:50,457 :: DEBUG :: Disconnecting Bluetooth link
+2024-10-17 17:56:50,459 :: INFO :: Disconnected Bluetooth link
+2024-10-17 17:56:50,461 :: INFO :: Disconnected from STM32
+2024-10-17 17:56:50,462 :: INFO :: Program exited!
+2024-10-17 17:57:16,472 :: INFO :: Bluetooth connection started
+2024-10-17 17:57:16,473 :: INFO :: in
+2024-10-17 17:57:16,497 :: INFO :: initialised server socket
+2024-10-17 17:57:16,498 :: INFO :: paramsset
+2024-10-17 17:57:16,499 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2024-10-17 17:57:17,851 :: INFO :: Accepted connection from: ('90:EE:C7:E7:D3:B8', 1)
+2024-10-17 17:57:17,866 :: INFO :: Connected to STM32
+2024-10-17 17:57:18,019 :: DEBUG :: API is up!
+2024-10-17 17:57:18,075 :: INFO :: Child Processes started
+2024-10-17 17:57:18,085 :: INFO :: Reconnection handler is watching...
+2024-10-17 17:57:18,149 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2024-10-17 17:57:18,151 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2024-10-17 17:57:18,152 :: DEBUG :: Sent to Android: {"cat": "mode", "value": "path"}
+2024-10-17 17:57:24,454 :: ERROR :: Error receiving message from Android: [Errno 104] Connection reset by peer
+2024-10-17 17:57:24,459 :: DEBUG :: Event set: Android connection dropped
+2024-10-17 17:57:24,460 :: ERROR :: Android link is down!
+2024-10-17 17:57:24,460 :: DEBUG :: Killing android child processes
+2024-10-17 17:57:24,468 :: DEBUG :: Android child processes killed
+2024-10-17 17:57:24,469 :: DEBUG :: Disconnecting Bluetooth link
+2024-10-17 17:57:24,470 :: INFO :: Disconnected Bluetooth link
+2024-10-17 17:57:24,471 :: INFO :: Bluetooth connection started
+2024-10-17 17:57:24,472 :: INFO :: in
+2024-10-17 17:57:24,519 :: INFO :: initialised server socket
+2024-10-17 17:57:24,521 :: INFO :: paramsset
+2024-10-17 17:57:24,525 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2024-10-17 17:57:26,051 :: INFO :: Accepted connection from: ('90:EE:C7:E7:D3:B8', 1)
+2024-10-17 17:57:26,071 :: INFO :: Android child processes restarted
+2024-10-17 17:57:26,133 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are reconnected!"}
+2024-10-17 17:57:26,134 :: DEBUG :: Sent to Android: {"cat": "mode", "value": "path"}
+2024-10-17 17:57:28,531 :: DEBUG :: b'{"cat":"obstacles","value":{"obstacles":[{"x":1,"y":14,"id":2,"d":2},{"x":12,"y":17,"id":5,"d":4},{"x":16,"y":11,"id":6,"d":6},{"x":7,"y":11,"id":4,"d":4},{"x":5,"y":5,"id":3,"d":6},{"x":16,"y":2,"id":1,"d":0}],"mode":"0","retrying":"False","robot_x":1,"robot_y":1,"robot_dir":0}}'
+2024-10-17 17:57:28,532 :: DEBUG :: Received from Android: {"cat":"obstacles","value":{"obstacles":[{"x":1,"y":14,"id":2,"d":2},{"x":12,"y":17,"id":5,"d":4},{"x":16,"y":11,"id":6,"d":6},{"x":7,"y":11,"id":4,"d":4},{"x":5,"y":5,"id":3,"d":6},{"x":16,"y":2,"id":1,"d":0}],"mode":"0","retrying":"False","robot_x":1,"robot_y":1,"robot_dir":0}}
+2024-10-17 17:57:28,540 :: DEBUG :: PiAction retrieved from queue: obstacles {'obstacles': [{'x': 1, 'y': 14, 'id': 2, 'd': 2}, {'x': 12, 'y': 17, 'id': 5, 'd': 4}, {'x': 16, 'y': 11, 'id': 6, 'd': 6}, {'x': 7, 'y': 11, 'id': 4, 'd': 4}, {'x': 5, 'y': 5, 'id': 3, 'd': 6}, {'x': 16, 'y': 2, 'id': 1, 'd': 0}], 'mode': '0', 'retrying': 'False', 'robot_x': 1, 'robot_y': 1, 'robot_dir': 0}
+2024-10-17 17:57:28,543 :: DEBUG :: Set obstacles PiAction added to queue: {'cat': 'obstacles', 'value': {'obstacles': [{'x': 1, 'y': 14, 'id': 2, 'd': 2}, {'x': 12, 'y': 17, 'id': 5, 'd': 4}, {'x': 16, 'y': 11, 'id': 6, 'd': 6}, {'x': 7, 'y': 11, 'id': 4, 'd': 4}, {'x': 5, 'y': 5, 'id': 3, 'd': 6}, {'x': 16, 'y': 2, 'id': 1, 'd': 0}], 'mode': '0', 'retrying': 'False', 'robot_x': 1, 'robot_y': 1, 'robot_dir': 0}}
+2024-10-17 17:57:28,546 :: INFO :: Requesting path from algo...
+2024-10-17 17:57:28,549 :: INFO :: data: {'obstacles': [{'x': 1, 'y': 14, 'id': 2, 'd': 2}, {'x': 12, 'y': 17, 'id': 5, 'd': 4}, {'x': 16, 'y': 11, 'id': 6, 'd': 6}, {'x': 7, 'y': 11, 'id': 4, 'd': 4}, {'x': 5, 'y': 5, 'id': 3, 'd': 6}, {'x': 16, 'y': 2, 'id': 1, 'd': 0}], 'mode': '0', 'retrying': 'False', 'robot_x': 1, 'robot_y': 1, 'robot_dir': 0}
+2024-10-17 17:57:28,550 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Requesting path from algo..."}

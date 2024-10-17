@@ -3,7 +3,7 @@ SERIAL_PORT = "/dev/ttyUSB0"  # stm32
 BAUD_RATE = 115200
 
 # API DETAILS
-API_IP = '172.20.10.8' # IP address of own laptop
+API_IP = '172.20.10.2' # IP address of own laptop
 API_PORT = 5000
 IMG_IP = '172.20.10.2'
 IMG_PORT = 5001

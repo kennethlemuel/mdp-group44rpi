@@ -371,8 +371,8 @@ class RaspberryPi:
         url = f"http://{IMG_IP}:{IMG_PORT}/predict"
         filename = f"{int(time.time())}_{obstacle_id}_{signal}.jpg"
         
-        image_folder = "~/shared/sc2079group44rpi/captured_images/"
-        annotated_folder = "~/shared/sc2079group44rpi/annotated_images/"
+        image_folder = "captured_images/"
+        annotated_folder = "annotated_images/"
 
         if not os.path.exists(image_folder):
             os.makedirs(image_folder)
